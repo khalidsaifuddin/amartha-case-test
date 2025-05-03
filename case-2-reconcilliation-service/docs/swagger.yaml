@@ -1,0 +1,119 @@
+definitions:
+  entity.BankTransaction:
+    properties:
+      amount:
+        type: number
+      bank_name:
+        type: string
+      date:
+        type: string
+      unique_identifier:
+        type: string
+    type: object
+  entity.ReconcileTransactionDetail:
+    properties:
+      percentage:
+        type: number
+      total_transaction_matched:
+        type: integer
+      total_transaction_processed:
+        type: integer
+      total_transaction_unmatched:
+        type: integer
+      unmatched_transaction_detail:
+        $ref: '#/definitions/entity.UnmatchedTransactionDetail'
+    type: object
+  entity.ReconcileTransactionRequest:
+    properties:
+      bank_transaction_paths:
+        items:
+          type: string
+        type: array
+      end_date:
+        type: string
+      is_async:
+        type: boolean
+      start_date:
+        type: string
+      system_transaction_path:
+        type: string
+    type: object
+  entity.ReconcileTransactionResponse:
+    properties:
+      progress_detail_url:
+        type: string
+      progress_percentage:
+        type: number
+      progress_status:
+        type: string
+      reconcile_transaction_detail:
+        $ref: '#/definitions/entity.ReconcileTransactionDetail'
+      serial:
+        type: string
+    type: object
+  entity.SystemTransaction:
+    properties:
+      amount:
+        type: number
+      transactionTime:
+        type: string
+      trxID:
+        type: string
+      type:
+        type: string
+    type: object
+  entity.UnmatchedTransactionDetail:
+    properties:
+      unmatched_bank_transaction:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/entity.BankTransaction'
+          type: array
+        type: object
+      unmatched_system_transaction:
+        items:
+          $ref: '#/definitions/entity.SystemTransaction'
+        type: array
+    type: object
+  helper.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1//transaction/reconcile:
+    post:
+      consumes:
+      - application/json
+      description: Reconcile Transaction between system and bank transaction
+      parameters:
+      - description: ReconcileTransaction payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ReconcileTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ReconcileTransactionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Reconcile Transaction between system and bank transaction
+      tags:
+      - Loan
+swagger: "2.0"

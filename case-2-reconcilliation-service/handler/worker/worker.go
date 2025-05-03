@@ -7,15 +7,18 @@ import (
 
 	"github.com/hibiken/asynq"
 	"github.com/khalidsaifuddin/amartha-case-test/case-2-reconcilliation-service/config"
+	"github.com/khalidsaifuddin/amartha-case-test/case-2-reconcilliation-service/core/entity"
+	"github.com/khalidsaifuddin/amartha-case-test/case-2-reconcilliation-service/core/module"
 )
 
 type WorkerServer struct {
-	cfg       config.Config
-	server    *asynq.Server
-	scheduler *asynq.Scheduler
+	cfg           config.Config
+	server        *asynq.Server
+	scheduler     *asynq.Scheduler
+	transactionUc module.TransactionUsecase
 }
 
-func NewWorkerServer(redisConf asynq.RedisClientOpt, cfg config.Config) *WorkerServer {
+func NewWorkerServer(redisConf asynq.RedisClientOpt, cfg config.Config, transactionUc module.TransactionUsecase) *WorkerServer {
 	workerConf := asynq.Config{
 		Concurrency: cfg.WorkerConcurrency,
 		Queues: map[string]int{
@@ -38,9 +41,10 @@ func NewWorkerServer(redisConf asynq.RedisClientOpt, cfg config.Config) *WorkerS
 	})
 
 	return &WorkerServer{
-		cfg:       cfg,
-		server:    server,
-		scheduler: scheduler,
+		cfg:           cfg,
+		server:        server,
+		scheduler:     scheduler,
+		transactionUc: transactionUc,
 	}
 }
 
@@ -48,6 +52,8 @@ func (w *WorkerServer) Run() {
 	log.Printf("worker server running")
 
 	mux := asynq.NewServeMux()
+
+	mux.HandleFunc(entity.TaskTypeTriggerReconcileTransaction, w.TriggerReconcileTransaction)
 
 	if err := w.server.Run(mux); err != nil {
 		log.Printf("could not run worker server: %v", err)

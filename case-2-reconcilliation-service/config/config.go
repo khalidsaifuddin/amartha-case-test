@@ -29,10 +29,11 @@ type Config struct {
 	AccessControlAllowOrigin string `envconfig:"ACCESS_CONTROL_ALLOW_ORIGIN" default:"*"`
 	AccessControlAllowMethod string `envconfig:"ACCESS_CONTROL_ALLOW_METHOD" default:"POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE"`
 
-	APISecretKey      string `envconfig:"API_SECRET_KEY" default:"APISecretKey"`
-	WorkerConcurrency int    `envconfig:"WORKER_CONCURRENCY" default:"10"`
-	WorkerEnabled     bool   `envconfig:"WORKER_ENABLED" default:"true"`
-	SchedulerEnabled  bool   `envconfig:"SCHEDULER_ENABLED" default:"true"`
+	APISecretKey                         string `envconfig:"API_SECRET_KEY" default:"APISecretKey"`
+	WorkerConcurrency                    int    `envconfig:"WORKER_CONCURRENCY" default:"10"`
+	WorkerEnabled                        bool   `envconfig:"WORKER_ENABLED" default:"true"`
+	SchedulerEnabled                     bool   `envconfig:"SCHEDULER_ENABLED" default:"true"`
+	TransactionReconciliationProgressURL string `envconfig:"TRANSACTION_RECONCILIATION_PROGRESS_URL" default:"/v1/transaction/reconcile/%v"`
 }
 
 func Get() Config {
