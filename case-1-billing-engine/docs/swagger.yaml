@@ -1,0 +1,402 @@
+definitions:
+  entity.GetOutstandingByLoanSerialRequest:
+    properties:
+      loan_serial:
+        type: string
+    type: object
+  entity.GetRepaymentHistoryListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/entity.LoanRepaymentHistory'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  entity.GetRepaymentListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/entity.LoanRepayment'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  entity.IsDelinquentByLoanSerialRequest:
+    properties:
+      loan_serial:
+        type: string
+      max_date:
+        description: ubah jadi string sementara
+        type: string
+    type: object
+  entity.IsDelinquentByLoanSerialResponse:
+    properties:
+      is_delinquent:
+        type: boolean
+      total_unpaid_amount:
+        type: number
+      unpaid_loan_repayments:
+        items:
+          $ref: '#/definitions/entity.LoanRepayment'
+        type: array
+    type: object
+  entity.Loan:
+    properties:
+      borrower_name:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      interest_rate:
+        type: number
+      loan_amount:
+        type: number
+      loan_name:
+        type: string
+      loan_outstanding:
+        type: number
+      loan_principal_only:
+        type: number
+      loan_term:
+        type: integer
+      loan_term_unit:
+        type: string
+      loan_total_amount:
+        type: number
+      serial:
+        type: string
+    type: object
+  entity.LoanRepayment:
+    properties:
+      amount:
+        type: number
+      id:
+        type: integer
+      installment_number:
+        type: integer
+      interest_amount:
+        type: number
+      loan:
+        $ref: '#/definitions/entity.Loan'
+      loan_repayment_history_serial:
+        type: string
+      repayment_amount:
+        type: number
+      repayment_due_date:
+        type: string
+      repayment_time:
+        type: string
+      serial:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  entity.LoanRepaymentHistory:
+    properties:
+      id:
+        type: integer
+      loan:
+        $ref: '#/definitions/entity.Loan'
+      loan_repayment:
+        $ref: '#/definitions/entity.LoanRepayment'
+      related_loan_repayments:
+        items:
+          $ref: '#/definitions/entity.LoanRepayment'
+        type: array
+      repayment_amount:
+        type: number
+      repayment_time:
+        type: string
+      serial:
+        type: string
+      status:
+        type: string
+    type: object
+  entity.MakeRepaymentRequest:
+    properties:
+      date:
+        type: string
+      loan_serial:
+        type: string
+      status:
+        type: string
+    type: object
+  entity.MakeRepaymentResponse:
+    properties:
+      loan_repayment:
+        items:
+          $ref: '#/definitions/entity.LoanRepayment'
+        type: array
+      message:
+        type: string
+      repayment_status:
+        type: boolean
+    type: object
+  entity.UpsertRepaymentTransactionRequest:
+    properties:
+      loan:
+        $ref: '#/definitions/entity.Loan'
+      loan_repayment:
+        items:
+          $ref: '#/definitions/entity.LoanRepayment'
+        type: array
+      loan_repayment_history:
+        $ref: '#/definitions/entity.LoanRepaymentHistory'
+    type: object
+  helper.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/loan/is_delinquent/{loan_serial}:
+    post:
+      consumes:
+      - application/json
+      description: Return true of there are at least 2 unpaid repayment
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      - description: Is Delinquent payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.IsDelinquentByLoanSerialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.IsDelinquentByLoanSerialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Check if Loan Borrower is specified as delinquent
+      tags:
+      - Loan
+  /v1/loan/outstanding/{loan_serial}:
+    get:
+      consumes:
+      - application/json
+      description: Get Loan Outstanding
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      - description: GetOutstandingByLoanSerial payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.GetOutstandingByLoanSerialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Loan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Get Loan Outstanding
+      tags:
+      - Loan
+  /v1/loan/repayment-history/{loan_serial}:
+    get:
+      consumes:
+      - application/json
+      description: Get List of repayment history for one loan
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.GetRepaymentHistoryListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Get List of repayment history for one loan
+      tags:
+      - Loan
+  /v1/loan/repayment/{loan_serial}:
+    get:
+      consumes:
+      - application/json
+      description: Get List of repayment schedule for one loan
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.GetRepaymentListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Get List of repayment schedule for one loan
+      tags:
+      - Loan
+    post:
+      consumes:
+      - application/json
+      description: Apply a repayment to the loan with the given serial
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      - description: Make Repayment payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MakeRepaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MakeRepaymentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Make a loan repayment
+      tags:
+      - Loan
+  /v1/loan/repayment/{loan_serial}/manual:
+    post:
+      consumes:
+      - application/json
+      description: Provide manual transaction for repayment process for FE if custom
+        payload is enabled
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      - description: UpsertRepaymentTransaction payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpsertRepaymentTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UpsertRepaymentTransactionRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Manual transaction for repayment process
+      tags:
+      - Loan
+  /v1/loan/repayment/next-schedule/{loan_serial}:
+    get:
+      consumes:
+      - application/json
+      description: Get List of next repayment schedule for one loan
+      parameters:
+      - description: Loan Serial
+        in: path
+        name: loan_serial
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.LoanRepayment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/helper.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/helper.Response'
+      summary: Get List of next repayment schedule for one loan
+      tags:
+      - Loan
+swagger: "2.0"

@@ -1,0 +1,612 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/v1/loan/is_delinquent/{loan_serial}": {
+            "post": {
+                "description": "Return true of there are at least 2 unpaid repayment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Check if Loan Borrower is specified as delinquent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Is Delinquent payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.IsDelinquentByLoanSerialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.IsDelinquentByLoanSerialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/loan/outstanding/{loan_serial}": {
+            "get": {
+                "description": "Get Loan Outstanding",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Get Loan Outstanding",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "GetOutstandingByLoanSerial payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.GetOutstandingByLoanSerialRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Loan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/loan/repayment-history/{loan_serial}": {
+            "get": {
+                "description": "Get List of repayment history for one loan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Get List of repayment history for one loan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.GetRepaymentHistoryListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/loan/repayment/next-schedule/{loan_serial}": {
+            "get": {
+                "description": "Get List of next repayment schedule for one loan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Get List of next repayment schedule for one loan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.LoanRepayment"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/loan/repayment/{loan_serial}": {
+            "get": {
+                "description": "Get List of repayment schedule for one loan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Get List of repayment schedule for one loan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.GetRepaymentListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Apply a repayment to the loan with the given serial",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Make a loan repayment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Make Repayment payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.MakeRepaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MakeRepaymentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/loan/repayment/{loan_serial}/manual": {
+            "post": {
+                "description": "Provide manual transaction for repayment process for FE if custom payload is enabled",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Loan"
+                ],
+                "summary": "Manual transaction for repayment process",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Loan Serial",
+                        "name": "loan_serial",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "UpsertRepaymentTransaction payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpsertRepaymentTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpsertRepaymentTransactionRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/helper.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.GetOutstandingByLoanSerialRequest": {
+            "type": "object",
+            "properties": {
+                "loan_serial": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.GetRepaymentHistoryListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepaymentHistory"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_data": {
+                    "type": "integer"
+                },
+                "total_page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.GetRepaymentListResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepayment"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_data": {
+                    "type": "integer"
+                },
+                "total_page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.IsDelinquentByLoanSerialRequest": {
+            "type": "object",
+            "properties": {
+                "loan_serial": {
+                    "type": "string"
+                },
+                "max_date": {
+                    "description": "ubah jadi string sementara",
+                    "type": "string"
+                }
+            }
+        },
+        "entity.IsDelinquentByLoanSerialResponse": {
+            "type": "object",
+            "properties": {
+                "is_delinquent": {
+                    "type": "boolean"
+                },
+                "total_unpaid_amount": {
+                    "type": "number"
+                },
+                "unpaid_loan_repayments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepayment"
+                    }
+                }
+            }
+        },
+        "entity.Loan": {
+            "type": "object",
+            "properties": {
+                "borrower_name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "interest_rate": {
+                    "type": "number"
+                },
+                "loan_amount": {
+                    "type": "number"
+                },
+                "loan_name": {
+                    "type": "string"
+                },
+                "loan_outstanding": {
+                    "type": "number"
+                },
+                "loan_principal_only": {
+                    "type": "number"
+                },
+                "loan_term": {
+                    "type": "integer"
+                },
+                "loan_term_unit": {
+                    "type": "string"
+                },
+                "loan_total_amount": {
+                    "type": "number"
+                },
+                "serial": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.LoanRepayment": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "installment_number": {
+                    "type": "integer"
+                },
+                "interest_amount": {
+                    "type": "number"
+                },
+                "loan": {
+                    "$ref": "#/definitions/entity.Loan"
+                },
+                "loan_repayment_history_serial": {
+                    "type": "string"
+                },
+                "repayment_amount": {
+                    "type": "number"
+                },
+                "repayment_due_date": {
+                    "type": "string"
+                },
+                "repayment_time": {
+                    "type": "string"
+                },
+                "serial": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "entity.LoanRepaymentHistory": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "loan": {
+                    "$ref": "#/definitions/entity.Loan"
+                },
+                "loan_repayment": {
+                    "$ref": "#/definitions/entity.LoanRepayment"
+                },
+                "related_loan_repayments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepayment"
+                    }
+                },
+                "repayment_amount": {
+                    "type": "number"
+                },
+                "repayment_time": {
+                    "type": "string"
+                },
+                "serial": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.MakeRepaymentRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "loan_serial": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.MakeRepaymentResponse": {
+            "type": "object",
+            "properties": {
+                "loan_repayment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepayment"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "repayment_status": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "entity.UpsertRepaymentTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "loan": {
+                    "$ref": "#/definitions/entity.Loan"
+                },
+                "loan_repayment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.LoanRepayment"
+                    }
+                },
+                "loan_repayment_history": {
+                    "$ref": "#/definitions/entity.LoanRepaymentHistory"
+                }
+            }
+        },
+        "helper.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "status": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
