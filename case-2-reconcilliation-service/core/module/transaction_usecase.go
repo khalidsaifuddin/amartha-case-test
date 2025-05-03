@@ -46,6 +46,7 @@ func (uc *transactionUsecase) RunReconcileTransaction(ctx context.Context, reque
 
 	if request.IsAsync {
 		log.Printf("trigger async task to worker server")
+
 		// trigger async task to worker server
 		// create task payload
 		payload := entity.ReconcileTransactionWorkerPayload{}
@@ -79,14 +80,14 @@ func (uc *transactionUsecase) ReconcileTransaction(ctx context.Context, request 
 	// logging in this function is verbose to track the progress of the transaction reconciliation
 	// especially when the transaction is asynchronous
 
-	systemTransactions, err := uc.ConvertSystemTransactionToStruct(ctx, request.SystemTransactionPath)
+	systemTransactions, err := uc.ConvertSystemTransactionToStruct(ctx, request.SystemTransactionPath, request.StartDate, request.EndDate)
 	if err != nil {
 		return resp, err
 	}
 
 	bankTransactionMap := make(map[string][]entity.BankTransaction)
 	for _, csvPath := range request.BankTransactionPaths {
-		bankTransactions, err := uc.ConvertBankTransactionToStruct(ctx, csvPath)
+		bankTransactions, err := uc.ConvertBankTransactionToStruct(ctx, csvPath, request.StartDate, request.EndDate)
 		if err != nil {
 			return resp, err
 		}
@@ -204,24 +205,37 @@ func (uc *transactionUsecase) SetTransactionReconciliationProgress(ctx context.C
 	return uc.transactionRepo.SetTransactionReconciliationProgress(updatedProgress)
 }
 
-func (uc *transactionUsecase) ConvertSystemTransactionToStruct(ctx context.Context, csvPath string) (resp []entity.SystemTransaction, err error) {
+func (uc *transactionUsecase) ConvertSystemTransactionToStruct(ctx context.Context, csvPath string, startDate, endDate time.Time) (resp []entity.SystemTransaction, err error) {
 	dataset, err := helper.ParseCSV(csvPath)
 	if err != nil {
 		return resp, err
 	}
 
 	for _, data := range dataset {
+		// Parse transaction time from string to time.Time
+		transactionTime, err := time.Parse(entity.DateTimeFormat, data["transactionTime"])
+		if err != nil {
+			continue
+		}
+
+		// Filter by start date if defined
+		if !startDate.IsZero() && transactionTime.Before(startDate) {
+			continue
+		}
+
+		// Filter by end date if defined
+		if !endDate.IsZero() && transactionTime.After(endDate) {
+			continue
+		}
+
 		entityRecord := entity.SystemTransaction{
 			TrxID: data["trxID"],
 			Amount: func() float64 {
 				amount, _ := strconv.ParseFloat(data["amount"], 64)
 				return amount
 			}(),
-			Type: data["type"],
-			TransactionTime: func() time.Time {
-				t, _ := time.Parse("2006-01-02 15:04:05", data["transactionTime"])
-				return t
-			}(),
+			Type:            data["type"],
+			TransactionTime: transactionTime,
 		}
 
 		resp = append(resp, entityRecord)
@@ -230,7 +244,7 @@ func (uc *transactionUsecase) ConvertSystemTransactionToStruct(ctx context.Conte
 	return resp, nil
 }
 
-func (uc *transactionUsecase) ConvertBankTransactionToStruct(ctx context.Context, csvPath string) (resp []entity.BankTransaction, err error) {
+func (uc *transactionUsecase) ConvertBankTransactionToStruct(ctx context.Context, csvPath string, startDate, endDate time.Time) (resp []entity.BankTransaction, err error) {
 	// get bank name from csv path, csv file name, for example: /tmp/bca.csv
 	// will be converted to bca
 	bankName := csvPath
@@ -244,6 +258,22 @@ func (uc *transactionUsecase) ConvertBankTransactionToStruct(ctx context.Context
 	}
 
 	for _, data := range dataset {
+		// Parse transaction time from string to time.Time
+		date, err := time.Parse(entity.DateFormat, data["date"])
+		if err != nil {
+			continue
+		}
+
+		// Filter by start date if defined
+		if !startDate.IsZero() && date.Before(startDate) {
+			continue
+		}
+
+		// Filter by end date if defined
+		if !endDate.IsZero() && date.After(endDate) {
+			continue
+		}
+
 		entityRecord := entity.BankTransaction{
 			BankName:         bankName,
 			UniqueIdentifier: data["unique_identifier"],
@@ -251,10 +281,7 @@ func (uc *transactionUsecase) ConvertBankTransactionToStruct(ctx context.Context
 				amount, _ := strconv.ParseFloat(data["amount"], 64)
 				return amount
 			}(),
-			Date: func() time.Time {
-				t, _ := time.Parse("2006-01-02", data["date"])
-				return t
-			}(),
+			Date: date,
 		}
 
 		resp = append(resp, entityRecord)
