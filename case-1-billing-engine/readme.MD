@@ -1,3 +1,5 @@
+![log amartha](https://dashboard.amartha.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FlogoAmartha.d775be25.png&w=640&q=75)
+
 # Amartha Case Test 1 - Billing Engine
 
 ## Related Documents
